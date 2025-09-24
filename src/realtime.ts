@@ -14,9 +14,6 @@ export type RoomState = {
 // Session storage key
 const SESSION_KEY = 'weather-checkin-session';
 
-// Use a simple JSON storage service for multi-user support
-const STORAGE_URL = 'https://jsonbin.io/v3/b';
-
 // State management
 let currentRoomId: string | null = null;
 let currentUserName: string | null = null;
