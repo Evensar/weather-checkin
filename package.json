@@ -4,8 +4,6 @@
   "version": "0.0.0",
   "scripts": {
     "dev": "vite",
-    "server": "node server.js",
-    "start": "node server.js",
     "build": "tsc -b && vite build && node ../build-landing.js",
     "lint": "eslint .",
     "preview": "vite preview",
@@ -13,13 +11,10 @@
   },
   "dependencies": {
     "chart.js": "^4.4.7",
-    "express": "^4.19.2",
     "html2canvas": "^1.4.1",
     "jspdf": "^3.0.3",
     "react": "^19.1.1",
-    "react-dom": "^19.1.1",
-    "socket.io": "^4.8.1",
-    "socket.io-client": "^4.8.1"
+    "react-dom": "^19.1.1"
   },
   "devDependencies": {
     "@eslint/js": "^9.36.0",
