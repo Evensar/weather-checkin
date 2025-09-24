@@ -9,6 +9,7 @@ function App() {
   const [alias, setAlias] = useState<string>('')
   const [state, setState] = useState<RoomState | null>(null)
   const [view, setView] = useState<'join' | 'checkin' | 'results'>('join')
+  const [hasLoggedOut, setHasLoggedOut] = useState<boolean>(false)
 
   useEffect(() => {
     const c = new RealtimeClient()
@@ -28,7 +29,7 @@ function App() {
     c.onState((s) => {
       console.log('State update received:', s)
       setState(s)
-      if (s && s.participants.length > 0) {
+      if (s && s.participants.length > 0 && !hasLoggedOut) {
         setView('checkin')
       }
     })
@@ -54,6 +55,7 @@ function App() {
       alert('Ange ditt namn eller alias först')
       return
     }
+    setHasLoggedOut(false); // Återställ logout-flaggan
     const id = await clientRef.current!.createRoom()
     setRoomId(id)
     location.hash = `#/room/${id}`
@@ -69,6 +71,7 @@ function App() {
 
   async function handleJoin() {
     if (!roomId || !alias) return
+    setHasLoggedOut(false); // Återställ logout-flaggan
     const ok = await clientRef.current!.joinRoom(roomId, alias)
     if (ok) {
       const s = await clientRef.current!.getState()
@@ -194,11 +197,14 @@ function App() {
           {state && view !== 'join' && (
             <button 
               onClick={() => {
+                setHasLoggedOut(true);
                 setView('join');
                 setState(null);
                 setAlias('');
                 location.hash = '';
                 localStorage.removeItem('weather-checkin-session');
+                // Rensa även rum-data från localStorage
+                localStorage.removeItem('weather-checkin-rooms');
               }} 
               className="rounded-lg bg-blue-700 px-3 py-2 text-white hover:bg-blue-800 no-print"
             >
