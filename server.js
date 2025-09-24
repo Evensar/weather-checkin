@@ -104,10 +104,18 @@ function roomState(roomId) {
 }
 
 const PORT = process.env.PORT || 3001;
-server.listen(PORT, () => {
-  // eslint-disable-next-line no-console
-  console.log(`Realtime server listening on :${PORT}`);
-});
+
+// For Vercel, we need to export the server
+if (process.env.NODE_ENV === 'production') {
+  // Vercel will handle the server
+  module.exports = app;
+} else {
+  // Local development
+  server.listen(PORT, () => {
+    // eslint-disable-next-line no-console
+    console.log(`Realtime server listening on :${PORT}`);
+  });
+}
 
 
 
