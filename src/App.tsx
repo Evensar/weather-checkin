@@ -191,24 +191,27 @@ function App() {
             </svg>
             Startsidan
           </a>
+          {state && view !== 'join' && (
+            <button 
+              onClick={() => {
+                setView('join');
+                setState(null);
+                setAlias('');
+                location.hash = '';
+                localStorage.removeItem('weather-checkin-session');
+              }} 
+              className="rounded-lg bg-blue-700 px-3 py-2 text-white hover:bg-blue-800 no-print"
+            >
+              Logga ut
+            </button>
+          )}
         </div>
         <div className="flex justify-between items-center">
           {state && view !== 'join' ? (
             <>
               <div><span className="font-semibold">Rum:</span> {state.roomId}</div>
               <h1 className="text-3xl font-bold absolute left-1/2 transform -translate-x-1/2">Weather Check-In</h1>
-              <button 
-                onClick={() => {
-                  setView('join');
-                  setState(null);
-                  setAlias('');
-                  location.hash = '';
-                  localStorage.removeItem('weather-checkin-session');
-                }} 
-                className="rounded-lg bg-blue-700 px-3 py-2 text-white hover:bg-blue-800 no-print"
-              >
-                Logga ut
-              </button>
+              <div className="w-20">{/* Empty div for spacing to balance the title */}</div>
             </>
           ) : (
             <div className="w-full">{/* Empty div for spacing when not showing room */}</div>
