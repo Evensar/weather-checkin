@@ -50,8 +50,8 @@ Projektet är strukturerat på följande sätt:
 
 ### Länkar och routing
 
-- Landningssidan länkar till `weather-checkin/` (relativ länk)
-- Weather Check-In har en "Startsidan"-länk som pekar på `/weather-checkin/landing.html` (produktion) eller `/landing.html` (utveckling)
+- Landningssidan länkar till `./` (relativ länk till Weather Check-In)
+- Weather Check-In har en "Startsidan"-länk som pekar på `landing.html` (relativ länk)
 - DriftCalc länkas med absolut URL till GitHub Pages
 
 ## Bygga och Deploya
@@ -87,11 +87,9 @@ För att säkerställa att landningssidan fungerar korrekt på GitHub Pages:
 4. Om du väljer "Deploy from a branch", välj "gh-pages" och "/ (root)"
 5. Klicka på "Save"
 
-Efter deployment kommer landningssidan att vara tillgänglig på:
-- `https://username.github.io/weather-checkin/` (startsida)
-- `https://username.github.io/weather-checkin/landing.html` (direkt länk till landningssidan)
-
-Weather Check-In-appen kommer att vara tillgänglig på `https://username.github.io/weather-checkin/weather-checkin/`.
+Efter deployment kommer:
+- **Weather Check-In** att vara tillgänglig på `https://username.github.io/weather-checkin/` (startsida)
+- **Landningssidan** att vara tillgänglig på `https://username.github.io/weather-checkin/landing.html`
 
 ### Felsökning
 

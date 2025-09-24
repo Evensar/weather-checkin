@@ -16,7 +16,7 @@ export default defineConfig({
     },
   },
   build: {
-    outDir: '../dist/weather-checkin',
+    outDir: '../dist',
     emptyOutDir: true,
     rollupOptions: {
       input: {

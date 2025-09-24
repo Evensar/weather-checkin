@@ -177,7 +177,7 @@ function App() {
       <div className="w-full max-w-3xl bg-white rounded-2xl shadow-xl p-6 md:p-8">
         <div className="flex justify-between items-center mb-8">
           <a 
-            href={window.location.hostname === 'localhost' ? '/landing.html' : '/weather-checkin/landing.html'}
+            href={window.location.hostname === 'localhost' ? '/landing.html' : 'landing.html'}
             className="rounded-lg bg-blue-600 px-3 py-2 text-white hover:bg-blue-700 transition-colors no-print flex items-center gap-1"
             onClick={(e) => {
               console.log('Startsidan-länken klickad');
