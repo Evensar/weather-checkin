@@ -4,7 +4,6 @@
   "version": "0.0.0",
   "scripts": {
     "dev": "vite",
-    "server": "node server.js",
     "build": "tsc -b && vite build && node ../build-landing.js",
     "lint": "eslint .",
     "preview": "vite preview",
@@ -12,8 +11,6 @@
   },
   "dependencies": {
     "chart.js": "^4.4.7",
-    "cors": "^2.8.5",
-    "express": "^4.19.2",
     "html2canvas": "^1.4.1",
     "jspdf": "^3.0.3",
     "react": "^19.1.1",
