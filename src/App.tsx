@@ -34,9 +34,21 @@ function App() {
   }, [state])
 
   async function handleCreateRoom() {
+    if (!alias) {
+      alert('Ange ditt namn eller alias först')
+      return
+    }
     const id = await clientRef.current!.createRoom()
     setRoomId(id)
     location.hash = `#/room/${id}`
+    
+    // Automatiskt gå med i rummet efter det skapats
+    const ok = await clientRef.current!.joinRoom(id, alias)
+    if (ok) {
+      const s = await clientRef.current!.getState()
+      setState(s)
+      setView('checkin')
+    }
   }
 
   async function handleJoin() {
@@ -122,7 +134,8 @@ function App() {
               </button>
               <button
                 onClick={handleCreateRoom}
-                className="inline-flex items-center justify-center rounded-lg bg-emerald-600 px-4 py-2 text-white hover:bg-emerald-700"
+                disabled={!alias}
+                className="inline-flex items-center justify-center rounded-lg bg-emerald-600 px-4 py-2 text-white hover:bg-emerald-700 disabled:opacity-50"
               >
                 Skapa rum
               </button>
