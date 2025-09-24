@@ -1,6 +1,6 @@
-import express from 'express';
-import http from 'http';
-import { Server } from 'socket.io';
+const express = require('express');
+const http = require('http');
+const { Server } = require('socket.io');
 
 // In-memory store (ephemeral)
 const rooms = new Map(); // roomId -> { participants: Map<socketId,{name, symbol|null}>, symbols:Set, ended:boolean, createdAt:number, anonymous:boolean }
@@ -106,11 +106,10 @@ function roomState(roomId) {
 const PORT = process.env.PORT || 3001;
 
 // For Vercel, we need to export the server
-if (process.env.NODE_ENV === 'production') {
-  // Vercel will handle the server
-  module.exports = app;
-} else {
-  // Local development
+module.exports = app;
+
+// Only start server locally
+if (process.env.NODE_ENV !== 'production') {
   server.listen(PORT, () => {
     // eslint-disable-next-line no-console
     console.log(`Realtime server listening on :${PORT}`);

@@ -35,7 +35,7 @@ function initSocket() {
   // Use Vercel server in production, localhost in development
   const serverUrl = window.location.hostname === 'localhost' 
     ? 'http://localhost:3001' 
-    : 'https://weather-checkin-server.vercel.app'; // Uppdatera detta med din Vercel URL
+    : 'https://weather-checkin-2zqbb6ub9zgv8czlzqthv2tex33q3.vercel.app';
   
   socket = io(serverUrl, {
     transports: ['websocket', 'polling']
