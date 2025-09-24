@@ -182,8 +182,8 @@ function App() {
               // I utvecklingsläge, gå till landningssidan i public-mappen
               window.location.href = '/landing.html';
             } else {
-              // I produktionsläge (GitHub Pages), gå upp två nivåer
-              window.location.href = '../../';
+              // I produktionsläge (GitHub Pages), gå till root
+              window.location.href = '/weather-checkin/';
             }
           }} className="rounded-lg bg-blue-600 px-3 py-2 text-white hover:bg-blue-700 transition-colors no-print flex items-center gap-1">
             <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">

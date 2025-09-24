@@ -50,8 +50,8 @@ Projektet är strukturerat på följande sätt:
 
 ### Länkar och routing
 
-- Landningssidan länkar till `weather-checkin/` (relativ länk)
-- Weather Check-In har en "Tillbaka till startsidan"-länk som pekar på `../../` (upp två nivåer)
+- Landningssidan länkar till `weather-checkin/weather-checkin/` (relativ länk)
+- Weather Check-In har en "Startsidan"-knapp som pekar på `/weather-checkin/` (root)
 - DriftCalc länkas med absolut URL till GitHub Pages
 
 ## Bygga och Deploya
@@ -88,6 +88,16 @@ För att säkerställa att landningssidan fungerar korrekt på GitHub Pages:
 5. Klicka på "Save"
 
 Efter deployment kommer landningssidan att vara tillgänglig på `https://username.github.io/weather-checkin/` och Weather Check-In-appen kommer att vara tillgänglig på `https://username.github.io/weather-checkin/weather-checkin/`.
+
+### Felsökning
+
+Om du upplever problem med att landningssidan inte visas eller att "Startsidan"-knappen leder till en 404-sida:
+
+1. Kontrollera att du har följt alla steg ovan
+2. Rensa din webbläsarcache eller öppna sidan i inkognitoläge
+3. Vänta några minuter efter deployment för att GitHub Pages ska uppdateras
+4. Kontrollera att byggprocessen har skapat rätt filstruktur i dist-mappen
+5. Kontrollera att landningssidan har kopierats korrekt till dist-mappen
 
 
 This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
