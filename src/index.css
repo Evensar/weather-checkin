@@ -15,16 +15,19 @@
     background-color: white !important;
     margin: 0 !important;
     padding: 0 !important;
+    page-break-inside: avoid !important;
   }
   #root {
     height: auto !important;
     overflow: visible !important;
     display: block !important;
+    page-break-inside: avoid !important;
   }
   .min-h-screen {
     min-height: auto !important;
     height: auto !important;
     padding: 0 !important;
+    page-break-inside: avoid !important;
   }
   .bg-gray-50 {
     background-color: white !important;
@@ -35,6 +38,15 @@
   .py-8 {
     padding-top: 0 !important;
     padding-bottom: 0 !important;
+  }
+  
+  /* Huvudcontainer för PDF */
+  .max-w-3xl {
+    max-width: 100% !important;
+    width: 100% !important;
+    margin: 0 !important;
+    padding: 10px !important;
+    page-break-inside: avoid !important;
   }
   
   /* Visa hela kommentarstexten i PDF */
@@ -51,6 +63,63 @@
     border: none !important;
     resize: none !important;
     font-family: inherit !important;
+  }
+  
+  /* Förhindra tomma sidor */
+  .page-break-avoid {
+    page-break-inside: avoid !important;
+    break-inside: avoid !important;
+  }
+  
+  /* Optimera för PDF-utskrift */
+  .grid {
+    page-break-inside: avoid !important;
+    break-inside: avoid !important;
+  }
+  
+  /* Begränsa höjden för att undvika tomma sidor */
+  .max-h-screen {
+    max-height: 100vh !important;
+  }
+  
+  /* Förhindra att innehåll hamnar på nästa sida */
+  .rounded-xl {
+    page-break-inside: avoid !important;
+    break-inside: avoid !important;
+  }
+  
+  /* Förhindra tomma sidor helt */
+  * {
+    page-break-after: avoid !important;
+    break-after: avoid !important;
+  }
+  
+  /* Specifika justeringar för resultat-vyn */
+  section {
+    page-break-inside: avoid !important;
+    break-inside: avoid !important;
+  }
+  
+  /* Minska gap för att spara plats */
+  .gap-10 {
+    gap: 1rem !important;
+  }
+  
+  .gap-3 {
+    gap: 0.5rem !important;
+  }
+  
+  /* Kompaktare padding */
+  .p-4 {
+    padding: 0.75rem !important;
+  }
+  
+  .p-6 {
+    padding: 1rem !important;
+  }
+  
+  .mb-10 {
+    margin-bottom: 1rem !important;
   }
 }
 

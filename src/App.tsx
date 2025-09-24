@@ -163,11 +163,23 @@ function App() {
       commentContainer.style.whiteSpace = 'pre-wrap';
       commentContainer.style.minHeight = '100px';
       commentContainer.style.padding = '12px';
+      commentContainer.style.border = '1px solid #d1d5db';
+      commentContainer.style.borderRadius = '8px';
+      commentContainer.style.backgroundColor = 'white';
       commentContainer.textContent = commentText;
       
       // Ersätt textarean temporärt
       commentField.style.display = 'none';
       commentField.parentNode?.insertBefore(commentContainer, commentField);
+    }
+    
+    // Optimera layout för PDF
+    const mainContainer = document.querySelector('.max-w-3xl') as HTMLElement;
+    if (mainContainer) {
+      mainContainer.style.maxWidth = '100%';
+      mainContainer.style.width = '100%';
+      mainContainer.style.margin = '0';
+      mainContainer.style.padding = '10px';
     }
     
     // Vänta lite så att CSS-ändringar hinner appliceras
@@ -187,8 +199,16 @@ function App() {
             tempDiv.remove();
           }
         }
+        
+        // Återställ main container
+        if (mainContainer) {
+          mainContainer.style.maxWidth = '';
+          mainContainer.style.width = '';
+          mainContainer.style.margin = '';
+          mainContainer.style.padding = '';
+        }
       }, 500);
-    }, 100);
+    }, 200);
   }
 
   return (
@@ -417,9 +437,9 @@ function App() {
             )}
 
             {view === 'results' && (
-              <section className="mt-2">
+              <section className="mt-2 page-break-avoid">
                 <h2 className="text-3xl font-semibold mb-10 text-center">Resultat</h2>
-                <div className="grid gap-10">
+                <div className="grid gap-10 page-break-avoid">
                   <div className="flex justify-center mb-4 no-print">
                     <button 
                       onClick={() => {
@@ -432,7 +452,7 @@ function App() {
         </button>
                   </div>
                   
-                  <div className="rounded-xl bg-gray-50 p-4">
+                  <div className="rounded-xl bg-gray-50 p-4 page-break-avoid">
                     <h3 className="font-semibold mb-3">Kommentar</h3>
                     <textarea 
                       className="w-full p-3 border rounded-lg min-h-[100px] focus:outline-none focus:ring-2 focus:ring-blue-500" 
@@ -441,9 +461,9 @@ function App() {
                     ></textarea>
                   </div>
                   
-                  <div className="rounded-xl bg-gray-50 p-4">
+                  <div className="rounded-xl bg-gray-50 p-4 page-break-avoid">
                     <h3 className="font-semibold mb-3">Summering</h3>
-                    <div className="flex flex-wrap gap-3">
+                    <div className="flex flex-wrap gap-3 page-break-avoid">
                       {summaryPairs.map(([key, count]) => (
                         <div key={key} className="flex items-center gap-2 rounded-lg bg-white px-3 py-2 shadow-sm">
                           <span className="text-2xl">{WEATHER_SYMBOLS[key].emoji}</span>
@@ -454,9 +474,9 @@ function App() {
                     </div>
                   </div>
 
-                  <div className="rounded-xl bg-gray-50 p-4">
+                  <div className="rounded-xl bg-gray-50 p-4 page-break-avoid">
                     <h3 className="font-semibold mb-3">Ikon-grid</h3>
-                    <div className="grid grid-cols-4 sm:grid-cols-6 md:grid-cols-8 gap-2">
+                    <div className="grid grid-cols-4 sm:grid-cols-6 md:grid-cols-8 gap-2 page-break-avoid">
                       {state.participants.map((p, idx) => (
                         <div key={idx} className="text-center">
                           <div className="text-2xl">{p.symbol ? WEATHER_SYMBOLS[p.symbol].emoji : '❓'}</div>
@@ -466,9 +486,9 @@ function App() {
                     </div>
                   </div>
 
-                  <div className="rounded-xl bg-gray-50 p-4">
+                  <div className="rounded-xl bg-gray-50 p-4 page-break-avoid">
                     <h3 className="font-semibold mb-3">Lista</h3>
-                    <ul className="space-y-1">
+                    <ul className="space-y-1 page-break-avoid">
                       {(!state.anonymous ? state.participants : []).map((p, idx) => (
                         <li key={idx} className="flex items-center justify-between rounded-md bg-white px-3 py-2 shadow-sm">
                           <span className="font-medium">{p.name}</span>
