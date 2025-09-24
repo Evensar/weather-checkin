@@ -13,6 +13,7 @@ function App() {
   const [isCheckingIn, setIsCheckingIn] = useState<boolean>(false)
   const [selectedSymbol, setSelectedSymbol] = useState<WeatherSymbolKey | null>(null)
   const stateHandlerRef = useRef<((state: RoomState) => void) | null>(null)
+  const currentViewRef = useRef<'join' | 'checkin' | 'results'>('join')
 
   useEffect(() => {
     const c = new RealtimeClient()
@@ -32,8 +33,10 @@ function App() {
     const stateHandler = (s: RoomState) => {
       console.log('State update received:', s)
       setState(s)
-      if (s && s.participants.length > 0 && !hasLoggedOut) {
+      // Bara sätt view till 'checkin' om användaren inte redan har valt en annan vy
+      if (s && s.participants.length > 0 && !hasLoggedOut && currentViewRef.current === 'join') {
         setView('checkin')
+        currentViewRef.current = 'checkin'
       }
     }
     
@@ -72,6 +75,7 @@ function App() {
       const s = await clientRef.current!.getState()
       setState(s)
       setView('checkin')
+      currentViewRef.current = 'checkin'
     }
   }
 
@@ -83,6 +87,7 @@ function App() {
       const s = await clientRef.current!.getState()
       setState(s)
       setView('checkin')
+      currentViewRef.current = 'checkin'
     }
   }
 
@@ -134,6 +139,7 @@ function App() {
   function endRound() {
     clientRef.current!.endRound()
     setView('results')
+    currentViewRef.current = 'results'
   }
 
   function toggleAnonymous() {
@@ -209,6 +215,7 @@ function App() {
               onClick={() => {
                 setHasLoggedOut(true);
                 setView('join');
+                currentViewRef.current = 'join';
                 setState(null);
                 setAlias('');
                 location.hash = '';
@@ -304,6 +311,7 @@ function App() {
                   onClick={() => {
                     setIsCheckingIn(true);
                     setView('checkin');
+                    currentViewRef.current = 'checkin';
                     // Återställ loading-state efter en kort delay
                     setTimeout(() => setIsCheckingIn(false), 500);
                   }} 
@@ -329,7 +337,10 @@ function App() {
                   )}
                 </button>
                 <button 
-                  onClick={() => setView('results')} 
+                  onClick={() => {
+                    setView('results');
+                    currentViewRef.current = 'results';
+                  }} 
                   className={`rounded-lg px-3 py-2 text-white hover:bg-blue-700 ${view==='results' ? 'bg-blue-700' : 'bg-blue-600'}`}
                 >
                   Resultat
@@ -411,7 +422,10 @@ function App() {
                 <div className="grid gap-10">
                   <div className="flex justify-center mb-4 no-print">
                     <button 
-                      onClick={() => setView('checkin')} 
+                      onClick={() => {
+                        setView('checkin');
+                        currentViewRef.current = 'checkin';
+                      }} 
                       className="inline-flex items-center justify-center rounded-lg bg-blue-600 px-4 py-2 text-white hover:bg-blue-700"
                     >
                       ← Tillbaka till Check-in
