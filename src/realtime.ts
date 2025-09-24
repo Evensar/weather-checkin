@@ -225,7 +225,12 @@ export class RealtimeClient {
       saveRooms();
       notifyState(currentRoomId);
     } else {
-      debug('User not found in room:', currentUserName);
+      // User not found, add them
+      debug('User not found in room, adding:', currentUserName);
+      room.participants.push({ name: currentUserName, symbol });
+      this.updateSummary(room);
+      saveRooms();
+      notifyState(currentRoomId);
     }
   }
 

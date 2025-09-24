@@ -3,8 +3,8 @@
 @tailwind utilities;
 
 @layer base {
-  html, body, #root { height: 100%; }
-  html, body { overflow: hidden; }
+  html, body, #root { min-height: 100%; }
+  /* Ta bort overflow: hidden för att tillåta scrollning */
 }
 
 @media print {

@@ -13,10 +13,26 @@ function App() {
   useEffect(() => {
     const c = new RealtimeClient()
     clientRef.current = c
+    
+    // Återställ användarnamn från tidigare session om det finns
+    const savedSession = localStorage.getItem('weather-checkin-session')
+    if (savedSession) {
+      try {
+        const { userName } = JSON.parse(savedSession)
+        if (userName) setAlias(userName)
+      } catch (e) {
+        console.error('Failed to parse session:', e)
+      }
+    }
+    
     c.onState((s) => {
+      console.log('State update received:', s)
       setState(s)
-      setView('checkin')
+      if (s && s.participants.length > 0) {
+        setView('checkin')
+      }
     })
+    
     return () => {
       // no explicit disconnect required; page unload will close
     }
@@ -62,10 +78,15 @@ function App() {
   }
 
   function pick(symbol: WeatherSymbolKey) {
-    if (!state || !alias) return;
+    if (!state || !alias) {
+      console.error('Cannot pick symbol: missing state or alias', { state: !!state, alias });
+      return;
+    }
     
-    // Update the participant directly
-    const room = { ...state };
+    console.log('Picking symbol', symbol, 'as', alias);
+    
+    // Update the participant directly for immediate UI feedback
+    const room = JSON.parse(JSON.stringify(state)) as RoomState; // Deep clone
     const participantIndex = room.participants.findIndex(p => p.name === alias);
     if (participantIndex >= 0) {
       room.participants[participantIndex].symbol = symbol;
@@ -82,8 +103,19 @@ function App() {
     });
     room.summary = summary;
     
+    // Uppdatera state omedelbart för direkt UI-feedback
     setState(room);
+    
+    // Skicka valet till servern och uppdatera alla klienter
     clientRef.current!.select(symbol);
+    
+    // Forcera en omrendering för att säkerställa att valet visas direkt
+    setTimeout(() => {
+      setState(prevState => {
+        if (!prevState) return prevState;
+        return {...prevState};
+      });
+    }, 50);
   }
 
   function endRound() {
@@ -102,97 +134,169 @@ function App() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 text-gray-900 flex items-center justify-center">
+    <div className="min-h-screen bg-gray-50 text-gray-900 flex justify-center py-8">
       <div className="w-full max-w-3xl bg-white rounded-2xl shadow-xl p-6 md:p-8">
-        <h1 className="text-3xl font-bold text-center mb-6">Weather Check-In</h1>
+        <div className="flex justify-between items-center">
+          {state && view !== 'join' ? (
+            <>
+              <div><span className="font-semibold">Rum:</span> {state.roomId}</div>
+              <h1 className="text-3xl font-bold absolute left-1/2 transform -translate-x-1/2">Weather Check-In</h1>
+              <button 
+                onClick={() => {
+                  setView('join');
+                  setState(null);
+                  setAlias('');
+                  location.hash = '';
+                  localStorage.removeItem('weather-checkin-session');
+                }} 
+                className="rounded-lg bg-blue-700 px-3 py-2 text-white hover:bg-blue-800"
+              >
+                Logga ut
+              </button>
+            </>
+          ) : (
+            <div className="w-full">{/* Empty div for spacing when not showing room */}</div>
+          )}
+        </div>
 
         {view === 'join' && (
-          <div className="grid gap-4">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-              <input
-                className="w-full rounded-lg border border-gray-300 px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                placeholder="Namn eller alias"
-                value={alias}
-                onChange={(e) => setAlias(e.target.value)}
-                aria-label="Namn eller alias"
-              />
-              <input
-                className="w-full rounded-lg border border-gray-300 px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                placeholder="Rums-ID"
-                value={roomId}
-                onChange={(e) => setRoomId(e.target.value)}
-                aria-label="Rums-ID"
-              />
-            </div>
-            <div className="flex flex-wrap gap-3">
-              <button
-                onClick={handleJoin}
-                disabled={!alias || !roomId}
-                className="inline-flex items-center justify-center rounded-lg bg-blue-600 px-4 py-2 text-white hover:bg-blue-700 disabled:opacity-50"
-              >
-                Gå med
-              </button>
-              <button
-                onClick={handleCreateRoom}
-                disabled={!alias}
-                className="inline-flex items-center justify-center rounded-lg bg-emerald-600 px-4 py-2 text-white hover:bg-emerald-700 disabled:opacity-50"
-              >
-                Skapa rum
-              </button>
-              {roomId && (
-                <button
-                  onClick={() => navigator.clipboard.writeText(location.href)}
-                  className="inline-flex items-center justify-center rounded-lg bg-gray-200 px-4 py-2 text-gray-800 hover:bg-gray-300"
-                >
-                  Kopiera länk
-                </button>
-              )}
+          <div className="flex flex-col items-center justify-center h-[60vh]">
+            <h1 className="text-3xl font-bold mb-12">Weather Check-In</h1>
+            <div className="w-full max-w-md">
+              <div className="grid gap-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <input
+                    className="w-full rounded-lg border border-gray-300 px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    placeholder="Namn eller alias"
+                    value={alias}
+                    onChange={(e) => setAlias(e.target.value)}
+                    aria-label="Namn eller alias"
+                  />
+                  <input
+                    className="w-full rounded-lg border border-gray-300 px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    placeholder="Rums-ID"
+                    value={roomId}
+                    onChange={(e) => setRoomId(e.target.value)}
+                    aria-label="Rums-ID"
+                  />
+                </div>
+                <div className="flex flex-wrap justify-center gap-4">
+                  <button
+                    onClick={handleJoin}
+                    disabled={!alias || !roomId}
+                    className="inline-flex items-center justify-center rounded-lg bg-blue-600 px-4 py-2 text-white hover:bg-blue-700 disabled:opacity-50"
+                  >
+                    Gå med
+                  </button>
+                  <button
+                    onClick={handleCreateRoom}
+                    disabled={!alias}
+                    className="inline-flex items-center justify-center rounded-lg bg-emerald-600 px-4 py-2 text-white hover:bg-emerald-700 disabled:opacity-50"
+                  >
+                    Skapa rum
+                  </button>
+                  {roomId && (
+                    <button
+                      onClick={() => navigator.clipboard.writeText(location.href)}
+                      className="inline-flex items-center justify-center rounded-lg bg-gray-200 px-4 py-2 text-gray-800 hover:bg-gray-300"
+                    >
+                      Kopiera länk
+                    </button>
+                  )}
+                </div>
+              </div>
             </div>
           </div>
         )}
 
         {state && view !== 'join' && (
           <div className="grid gap-6">
-            <div className="flex flex-wrap items-center gap-3 border-b pb-4">
-              <div><span className="font-semibold">Rum:</span> {state.roomId}</div>
-              <div className="ml-auto flex flex-wrap gap-3 no-print">
-                <button onClick={toggleAnonymous} className="rounded-lg bg-purple-600 px-3 py-2 text-white hover:bg-purple-700">
+            <div className="flex flex-col gap-6 border-b pb-6 mb-6 mt-12">
+              
+              <div className="flex flex-wrap justify-center gap-5 no-print mt-6">
+                <button 
+                  onClick={toggleAnonymous} 
+                  className="rounded-lg bg-blue-600 px-3 py-2 text-white hover:bg-blue-700"
+                >
                   {state.anonymous ? 'Icke-anonymt läge' : 'Anonymt läge'}
                 </button>
-                <button onClick={() => setView('checkin')} className={`rounded-lg px-3 py-2 hover:bg-gray-100 ${view==='checkin' ? 'bg-gray-100' : 'bg-white'} border`}>Check-in</button>
-                <button onClick={() => setView('results')} className={`rounded-lg px-3 py-2 hover:bg-gray-100 ${view==='results' ? 'bg-gray-100' : 'bg-white'} border`}>Resultat</button>
-                <button onClick={exportPDF} className="rounded-lg bg-indigo-600 px-3 py-2 text-white hover:bg-indigo-700">Exportera till PDF</button>
-                {!state.ended && <button onClick={endRound} className="rounded-lg bg-rose-600 px-3 py-2 text-white hover:bg-rose-700">Avsluta omgång</button>}
+                <button 
+                  onClick={() => setView('checkin')} 
+                  className={`rounded-lg px-3 py-2 text-white hover:bg-blue-700 ${view==='checkin' ? 'bg-blue-700' : 'bg-blue-600'}`}
+                >
+                  Check-in
+                </button>
+                <button 
+                  onClick={() => setView('results')} 
+                  className={`rounded-lg px-3 py-2 text-white hover:bg-blue-700 ${view==='results' ? 'bg-blue-700' : 'bg-blue-600'}`}
+                >
+                  Resultat
+                </button>
+                <button 
+                  onClick={exportPDF} 
+                  className="rounded-lg bg-blue-600 px-3 py-2 text-white hover:bg-blue-700"
+                >
+                  Exportera till PDF
+                </button>
+                <button 
+                  onClick={endRound} 
+                  disabled={state.ended}
+                  className={`rounded-lg px-3 py-2 text-white hover:bg-blue-800 ${state.ended ? 'bg-gray-400 cursor-not-allowed' : 'bg-blue-700'}`}
+                >
+                  {state.ended ? 'Omgång avslutad' : 'Avsluta omgång'}
+                </button>
               </div>
             </div>
 
             {view === 'checkin' && (
-              <section>
-                <h2 className="text-xl font-semibold mb-4 text-center">Välj ditt väder</h2>
-                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-3">
+              <section className="mt-2">
+                <h2 className="text-3xl font-semibold mb-10 text-center">Välj ditt väder</h2>
+                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-6">
                   {WEATHER_ORDER.map((key) => {
                     const s = WEATHER_SYMBOLS[key]
-                    const selected = state?.participants.find((p) => p.name === alias)?.symbol === key
+                    // Hitta användarens val genom att söka efter alias i deltagarlistan
+                    const currentUser = state?.participants.find((p) => p.name === alias);
+                    const selected = currentUser?.symbol === key;
+                    
+                    // Forcera omrendering med key för att säkerställa att UI uppdateras
+                    const renderKey = `${key}-${selected}-${Date.now()}`;
+                    
+                    console.log(`Symbol ${key}: selected=${selected}`, 
+                      { alias, currentUser: currentUser?.name, currentSymbol: currentUser?.symbol, renderKey });
+                    
                     return (
                       <button
-                        key={key}
+                        key={renderKey}
                         onClick={() => pick(key)}
                         aria-pressed={selected}
-                        className={`flex flex-col items-center gap-2 rounded-xl border p-4 text-lg transition-colors ${selected ? 'border-blue-600 bg-blue-50 ring-2 ring-blue-200' : 'border-gray-200 hover:bg-gray-50'}`}
+                        className={`flex flex-col items-center gap-2 rounded-xl border p-4 text-lg transition-colors ${
+                          selected 
+                            ? 'border-blue-600 bg-blue-50 ring-2 ring-blue-200' 
+                            : 'border-gray-200 hover:bg-gray-50'
+                        }`}
                       >
                         <span className="text-4xl">{s.emoji}</span>
                         <span>{s.label}</span>
                       </button>
                     )
                   })}
-                </div>
+      </div>
               </section>
             )}
 
             {view === 'results' && (
-              <section>
-                <h2 className="text-xl font-semibold mb-4 text-center">Resultat</h2>
-                <div className="grid gap-6">
+              <section className="mt-2">
+                <h2 className="text-3xl font-semibold mb-10 text-center">Resultat</h2>
+                <div className="grid gap-10">
+                  <div className="flex justify-center mb-4 no-print">
+                    <button 
+                      onClick={() => setView('checkin')} 
+                      className="inline-flex items-center justify-center rounded-lg bg-blue-600 px-4 py-2 text-white hover:bg-blue-700"
+                    >
+                      ← Tillbaka till Check-in
+        </button>
+                  </div>
+                  
                   <div className="rounded-xl bg-gray-50 p-4">
                     <h3 className="font-semibold mb-3">Summering</h3>
                     <div className="flex flex-wrap gap-3">
