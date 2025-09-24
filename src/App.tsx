@@ -50,7 +50,28 @@ function App() {
   }
 
   function pick(symbol: WeatherSymbolKey) {
-    clientRef.current!.select(symbol)
+    if (!state || !alias) return;
+    
+    // Update the participant directly
+    const room = { ...state };
+    const participantIndex = room.participants.findIndex(p => p.name === alias);
+    if (participantIndex >= 0) {
+      room.participants[participantIndex].symbol = symbol;
+    } else {
+      room.participants.push({ name: alias, symbol });
+    }
+    
+    // Update summary
+    const summary: Record<string, number> = { sun: 0, partly: 0, cloud: 0, rain: 0, storm: 0 };
+    room.participants.forEach(p => {
+      if (p.symbol) {
+        summary[p.symbol] = (summary[p.symbol] || 0) + 1;
+      }
+    });
+    room.summary = summary;
+    
+    setState(room);
+    clientRef.current!.select(symbol);
   }
 
   function endRound() {
