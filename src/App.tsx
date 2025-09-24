@@ -175,6 +175,23 @@ function App() {
   return (
     <div className="min-h-screen bg-gray-50 text-gray-900 flex justify-center py-8">
       <div className="w-full max-w-3xl bg-white rounded-2xl shadow-xl p-6 md:p-8">
+        <div className="flex justify-between items-center mb-8">
+          <button onClick={() => {
+            // Kontrollera om vi är i utvecklingsläge (localhost) eller produktionsläge
+            if (window.location.hostname === 'localhost') {
+              // I utvecklingsläge, gå till landningssidan i public-mappen
+              window.location.href = '/landing.html';
+            } else {
+              // I produktionsläge (GitHub Pages), gå upp två nivåer
+              window.location.href = '../../';
+            }
+          }} className="rounded-lg bg-blue-600 px-3 py-2 text-white hover:bg-blue-700 transition-colors no-print flex items-center gap-1">
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
+              <path fillRule="evenodd" d="M9.707 16.707a1 1 0 01-1.414 0l-6-6a1 1 0 010-1.414l6-6a1 1 0 011.414 1.414L5.414 9H17a1 1 0 110 2H5.414l4.293 4.293a1 1 0 010 1.414z" clipRule="evenodd" />
+            </svg>
+            Startsidan
+          </button>
+        </div>
         <div className="flex justify-between items-center">
           {state && view !== 'join' ? (
             <>

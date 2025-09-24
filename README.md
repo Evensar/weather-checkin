@@ -1,4 +1,8 @@
-# Weather Check-In
+# Weather Check-In & DriftCalc Landing Page
+
+Ett projekt som innehåller både Weather Check-In och en landningssida som länkar till både Weather Check-In och DriftCalc.
+
+## Weather Check-In
 
 Ett enkelt, lekfullt verktyg för att låta deltagare i ett möte checka in med en vädersymbol. Byggt med React + Vite och en liten Socket.IO-server.
 
@@ -32,6 +36,58 @@ Använd knappen "Exportera till PDF" och välj "Spara som PDF" i dialogen. Onöd
 
 ## Språk
 UI är på svenska i grundläge och kan enkelt översättas.
+
+## Landningssida
+
+Projektet innehåller nu en landningssida som låter användare välja mellan Weather Check-In och DriftCalc. Landningssidan finns i roten av projektet (`/index.html`).
+
+### Struktur
+
+Projektet är strukturerat på följande sätt:
+- `/index.html` - Landningssidan som länkar till båda tjänsterna
+- `/weather-checkin/` - Weather Check-In-applikationen
+- `/build-landing.js` - Script som kopierar landningssidan till dist-mappen under bygget
+
+### Länkar och routing
+
+- Landningssidan länkar till `weather-checkin/` (relativ länk)
+- Weather Check-In har en "Tillbaka till startsidan"-länk som pekar på `../../` (upp två nivåer)
+- DriftCalc länkas med absolut URL till GitHub Pages
+
+## Bygga och Deploya
+
+För att bygga projektet med landningssidan:
+
+```bash
+npm run build
+```
+
+Byggprocessen består av följande steg:
+1. TypeScript-kompilering (`tsc -b`)
+2. Vite-bygge av Weather Check-In-appen (`vite build`)
+3. Kopiering av landningssidan till dist-mappen (`node ../build-landing.js`)
+
+Detta kommer att skapa en `dist`-mapp i projektets rot som innehåller både landningssidan och Weather Check-In-applikationen. Landningssidan blir startsidan på GitHub Pages.
+
+För att deploya till GitHub Pages:
+
+```bash
+npm run deploy
+```
+
+Detta kommer att publicera innehållet i `dist`-mappen till GitHub Pages.
+
+### GitHub Pages-konfiguration
+
+För att säkerställa att landningssidan fungerar korrekt på GitHub Pages:
+
+1. Gå till ditt GitHub-repository
+2. Gå till Settings > Pages
+3. Under "Source", välj "GitHub Actions" eller "Deploy from a branch"
+4. Om du väljer "Deploy from a branch", välj "gh-pages" och "/ (root)"
+5. Klicka på "Save"
+
+Efter deployment kommer landningssidan att vara tillgänglig på `https://username.github.io/weather-checkin/` och Weather Check-In-appen kommer att vara tillgänglig på `https://username.github.io/weather-checkin/weather-checkin/`.
 
 
 This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.

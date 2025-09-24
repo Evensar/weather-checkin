@@ -11,3 +11,4 @@ export const WEATHER_SYMBOLS: Record<WeatherSymbolKey, { label: string; emoji: s
 export const WEATHER_ORDER: WeatherSymbolKey[] = ['sun', 'partly', 'cloud', 'rain', 'storm'];
 
 
+
