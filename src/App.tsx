@@ -129,8 +129,47 @@ function App() {
   }
 
   function exportPDF() {
-    // Simple approach: use browser print to save as PDF
-    window.print()
+    // Sätt temporärt en klass på body för att optimera utskrift
+    document.body.classList.add('printing');
+    
+    // Spara kommentarstexten för att säkerställa att den visas korrekt i PDF
+    const commentField = document.getElementById('comment-field') as HTMLTextAreaElement;
+    let commentText = '';
+    if (commentField) {
+      commentText = commentField.value;
+      
+      // Skapa en temporär div som ersätter textarean för bättre visning i PDF
+      const commentContainer = document.createElement('div');
+      commentContainer.id = 'comment-text-for-pdf';
+      commentContainer.style.whiteSpace = 'pre-wrap';
+      commentContainer.style.minHeight = '100px';
+      commentContainer.style.padding = '12px';
+      commentContainer.textContent = commentText;
+      
+      // Ersätt textarean temporärt
+      commentField.style.display = 'none';
+      commentField.parentNode?.insertBefore(commentContainer, commentField);
+    }
+    
+    // Vänta lite så att CSS-ändringar hinner appliceras
+    setTimeout(() => {
+      // Använd webbläsarens utskriftsfunktion
+      window.print();
+      
+      // Ta bort den temporära klassen och återställ kommentarsfältet efter utskrift
+      setTimeout(() => {
+        document.body.classList.remove('printing');
+        
+        // Återställ kommentarsfältet
+        if (commentField) {
+          commentField.style.display = '';
+          const tempDiv = document.getElementById('comment-text-for-pdf');
+          if (tempDiv) {
+            tempDiv.remove();
+          }
+        }
+      }, 500);
+    }, 100);
   }
 
   return (
@@ -149,7 +188,7 @@ function App() {
                   location.hash = '';
                   localStorage.removeItem('weather-checkin-session');
                 }} 
-                className="rounded-lg bg-blue-700 px-3 py-2 text-white hover:bg-blue-800"
+                className="rounded-lg bg-blue-700 px-3 py-2 text-white hover:bg-blue-800 no-print"
               >
                 Logga ut
               </button>
@@ -232,12 +271,14 @@ function App() {
                 >
                   Resultat
                 </button>
-                <button 
-                  onClick={exportPDF} 
-                  className="rounded-lg bg-blue-600 px-3 py-2 text-white hover:bg-blue-700"
-                >
-                  Exportera till PDF
-                </button>
+                {view === 'results' && (
+                  <button 
+                    onClick={exportPDF} 
+                    className="rounded-lg bg-blue-600 px-3 py-2 text-white hover:bg-blue-700"
+                  >
+                    Exportera till PDF
+                  </button>
+                )}
                 <button 
                   onClick={endRound} 
                   disabled={state.ended}
@@ -295,6 +336,15 @@ function App() {
                     >
                       ← Tillbaka till Check-in
         </button>
+                  </div>
+                  
+                  <div className="rounded-xl bg-gray-50 p-4">
+                    <h3 className="font-semibold mb-3">Kommentar</h3>
+                    <textarea 
+                      className="w-full p-3 border rounded-lg min-h-[100px] focus:outline-none focus:ring-2 focus:ring-blue-500" 
+                      placeholder="Lägg till en kommentar om denna check-in..."
+                      id="comment-field"
+                    ></textarea>
                   </div>
                   
                   <div className="rounded-xl bg-gray-50 p-4">

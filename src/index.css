@@ -9,4 +9,53 @@
 
 @media print {
   .no-print { display: none !important; }
+  html, body { 
+    height: auto !important;
+    overflow: visible !important;
+    background-color: white !important;
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+  #root {
+    height: auto !important;
+    overflow: visible !important;
+    display: block !important;
+  }
+  .min-h-screen {
+    min-height: auto !important;
+    height: auto !important;
+    padding: 0 !important;
+  }
+  .bg-gray-50 {
+    background-color: white !important;
+  }
+  .shadow-xl {
+    box-shadow: none !important;
+  }
+  .py-8 {
+    padding-top: 0 !important;
+    padding-bottom: 0 !important;
+  }
+  
+  /* Visa hela kommentarstexten i PDF */
+  textarea {
+    height: auto !important;
+    min-height: auto !important;
+    overflow: visible !important;
+    white-space: pre-wrap !important;
+    page-break-inside: avoid !important;
+  }
+  
+  /* Ersätt textarea med div för bättre visning i PDF */
+  textarea#comment-field {
+    border: none !important;
+    resize: none !important;
+    font-family: inherit !important;
+  }
+}
+
+/* Klass som läggs till temporärt vid utskrift */
+body.printing {
+  overflow: visible !important;
+  height: auto !important;
 }
