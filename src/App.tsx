@@ -10,6 +10,8 @@ function App() {
   const [state, setState] = useState<RoomState | null>(null)
   const [view, setView] = useState<'join' | 'checkin' | 'results'>('join')
   const [hasLoggedOut, setHasLoggedOut] = useState<boolean>(false)
+  const [isCheckingIn, setIsCheckingIn] = useState<boolean>(false)
+  const [selectedSymbol, setSelectedSymbol] = useState<WeatherSymbolKey | null>(null)
   const stateHandlerRef = useRef<((state: RoomState) => void) | null>(null)
 
   useEffect(() => {
@@ -91,6 +93,7 @@ function App() {
     }
     
     console.log('Picking symbol', symbol, 'as', alias);
+    setSelectedSymbol(symbol); // Visa loading-state
     
     // Update the participant directly for immediate UI feedback
     const room = JSON.parse(JSON.stringify(state)) as RoomState; // Deep clone
@@ -123,6 +126,9 @@ function App() {
         return {...prevState};
       });
     }, 50);
+    
+    // Återställ loading-state efter en kort delay
+    setTimeout(() => setSelectedSymbol(null), 800);
   }
 
   function endRound() {
@@ -295,10 +301,32 @@ function App() {
                   {state.anonymous ? 'Icke-anonymt läge' : 'Anonymt läge'}
                 </button>
                 <button 
-                  onClick={() => setView('checkin')} 
-                  className={`rounded-lg px-3 py-2 text-white hover:bg-blue-700 ${view==='checkin' ? 'bg-blue-700' : 'bg-blue-600'}`}
+                  onClick={() => {
+                    setIsCheckingIn(true);
+                    setView('checkin');
+                    // Återställ loading-state efter en kort delay
+                    setTimeout(() => setIsCheckingIn(false), 500);
+                  }} 
+                  disabled={isCheckingIn}
+                  className={`rounded-lg px-3 py-2 text-white transition-all duration-200 ${
+                    isCheckingIn 
+                      ? 'bg-green-600 cursor-not-allowed' 
+                      : view==='checkin' 
+                        ? 'bg-blue-700 hover:bg-blue-800' 
+                        : 'bg-blue-600 hover:bg-blue-700'
+                  }`}
                 >
-                  Check-in
+                  {isCheckingIn ? (
+                    <span className="flex items-center gap-2">
+                      <svg className="animate-spin h-4 w-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                      </svg>
+                      Checkar in...
+                    </span>
+                  ) : (
+                    'Check-in'
+                  )}
                 </button>
                 <button 
                   onClick={() => setView('results')} 
@@ -340,19 +368,36 @@ function App() {
                     console.log(`Symbol ${key}: selected=${selected}`, 
                       { alias, currentUser: currentUser?.name, currentSymbol: currentUser?.symbol, renderKey });
                     
+                    const isSelecting = selectedSymbol === key;
+                    
                     return (
                       <button
                         key={renderKey}
                         onClick={() => pick(key)}
+                        disabled={isSelecting}
                         aria-pressed={selected}
-                        className={`flex flex-col items-center gap-2 rounded-xl border p-4 text-lg transition-colors ${
-                          selected 
-                            ? 'border-blue-600 bg-blue-50 ring-2 ring-blue-200' 
-                            : 'border-gray-200 hover:bg-gray-50'
+                        className={`flex flex-col items-center gap-2 rounded-xl border p-4 text-lg transition-all duration-200 ${
+                          isSelecting
+                            ? 'border-green-500 bg-green-50 ring-2 ring-green-200 cursor-not-allowed'
+                            : selected 
+                              ? 'border-blue-600 bg-blue-50 ring-2 ring-blue-200' 
+                              : 'border-gray-200 hover:bg-gray-50 hover:border-gray-300'
                         }`}
                       >
-                        <span className="text-4xl">{s.emoji}</span>
-                        <span>{s.label}</span>
+                        {isSelecting ? (
+                          <div className="flex flex-col items-center gap-2">
+                            <svg className="animate-spin h-6 w-6 text-green-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                              <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                              <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                            </svg>
+                            <span className="text-sm font-medium text-green-600">Väljer...</span>
+                          </div>
+                        ) : (
+                          <>
+                            <span className="text-4xl">{s.emoji}</span>
+                            <span>{s.label}</span>
+                          </>
+                        )}
                       </button>
                     )
                   })}
