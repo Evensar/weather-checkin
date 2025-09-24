@@ -160,6 +160,15 @@ export class RealtimeClient {
     }
   }
 
+  // Remove state handler (for logout)
+  offState(handler: (state: RoomState) => void) {
+    const index = stateHandlers.indexOf(handler);
+    if (index > -1) {
+      stateHandlers.splice(index, 1);
+      debug('Removed state handler');
+    }
+  }
+
   createRoom(roomId?: string): Promise<string> {
     const id = roomId || Math.random().toString(36).slice(2, 8);
     const now = Date.now();
@@ -301,6 +310,15 @@ export class RealtimeClient {
       }
     });
     room.summary = summary;
+  }
+
+  // Clear session and logout
+  logout() {
+    debug('Logging out - clearing session');
+    currentRoomId = null;
+    currentUserName = null;
+    stopPolling();
+    saveSession();
   }
 
   // Cleanup method

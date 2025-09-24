@@ -10,6 +10,7 @@ function App() {
   const [state, setState] = useState<RoomState | null>(null)
   const [view, setView] = useState<'join' | 'checkin' | 'results'>('join')
   const [hasLoggedOut, setHasLoggedOut] = useState<boolean>(false)
+  const stateHandlerRef = useRef<((state: RoomState) => void) | null>(null)
 
   useEffect(() => {
     const c = new RealtimeClient()
@@ -26,13 +27,16 @@ function App() {
       }
     }
     
-    c.onState((s) => {
+    const stateHandler = (s: RoomState) => {
       console.log('State update received:', s)
       setState(s)
       if (s && s.participants.length > 0 && !hasLoggedOut) {
         setView('checkin')
       }
-    })
+    }
+    
+    stateHandlerRef.current = stateHandler
+    c.onState(stateHandler)
     
     return () => {
       // no explicit disconnect required; page unload will close
@@ -202,7 +206,12 @@ function App() {
                 setState(null);
                 setAlias('');
                 location.hash = '';
-                localStorage.removeItem('weather-checkin-session');
+                // Ta bort state handler först
+                if (stateHandlerRef.current) {
+                  clientRef.current?.offState(stateHandlerRef.current);
+                }
+                // Använd RealtimeClient logout-metoden
+                clientRef.current?.logout();
                 // Rensa även rum-data från localStorage
                 localStorage.removeItem('weather-checkin-rooms');
               }} 
