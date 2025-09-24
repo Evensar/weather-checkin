@@ -45,12 +45,12 @@ Projektet innehåller nu en landningssida som låter användare välja mellan We
 
 Projektet är strukturerat på följande sätt:
 - `/index.html` - Landningssidan som länkar till båda tjänsterna
-- `/weather-checkin/` - Weather Check-In-applikationen
+- `/weather-checkin/` - Weather Check-In-applikationen (byggd i undermapp)
 - `/build-landing.js` - Script som kopierar landningssidan till dist-mappen under bygget
 
 ### Länkar och routing
 
-- Landningssidan länkar till `weather-checkin/weather-checkin/` (relativ länk)
+- Landningssidan länkar till `weather-checkin/` (relativ länk)
 - Weather Check-In har en "Startsidan"-knapp som pekar på `/weather-checkin/` (root)
 - DriftCalc länkas med absolut URL till GitHub Pages
 
